@@ -1,5 +1,6 @@
 package main;
 
+import front.Account;
 import front.Window;
 
 public class Main {

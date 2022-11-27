@@ -1,5 +1,8 @@
 package structs;
 
+import funcs.Out0In2;
+import funcs.Out0In3;
+
 public class HashSeq<K, V> {
     public Seq<K> keys = new Seq<K>();
     public Seq<V> values = new Seq<V>();
@@ -25,5 +28,13 @@ public class HashSeq<K, V> {
 
     public V get(K k){
         return values.get(keys.getIndex(k));
+    }
+
+    public void each(Out0In2<K, V> f){
+        keys.eachIndexed((k, i) -> f.get(k, values.get(i)));
+    }
+
+    public void eachIndexed(Out0In3<K, V, Integer> f){
+        keys.eachIndexed((k, i) -> f.get(k, values.get(i), i));
     }
 }

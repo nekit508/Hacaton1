@@ -12,9 +12,13 @@ import java.awt.*;
 public class Account {
     public String token = "null", name = "new", group = "";
 
-    JPanel container;
+    public JPanel container;
+    public Checkbox checkbox;
+    public JLabel label;
+    public Button settings;
 
     public Account(){
+        Main.w.accountList.accounts.add(this);
     }
 
     public void load(BaseSaveLoadStream stream){
@@ -29,43 +33,27 @@ public class Account {
         stream.writeS(group);
     }
 
-    static int getFarCompX(Component... c){
-        int out = c[0].getX();
-        for (Component component : c) {
-            out += component.getWidth();
-        }
-        return out;
-    }
-
-    static int getFarCompY(Component... c){
-        int out = c[0].getY();
-        for (Component component : c) {
-            out += component.getHeight();
-        }
-        return out;
-    }
-
-
     public void constructItems(JPanel panel, int heightOffset){
         container = new JPanel();
         container.setLayout(null);
 
-        Checkbox checkBox = new Checkbox();
-        checkBox.setBounds(0, 0, Settings.ACU.get(), Settings.ACH.get());
+        checkbox = new Checkbox();
+        checkbox.setBounds(0, 0, Settings.ACU.get(), Settings.ACH.get());
 
-        JLabel label = new JLabel();
+        label = new JLabel();
         label.setText(name + "     группа: " + group);
-        label.setBounds(getFarCompX(checkBox), 0, Settings.ACW.get() - 2 * Settings.ACU.get(), Settings.ACH.get());
+        label.setBounds(Settings.ACU.get(), 0, Settings.ACW.get() - Settings.ACU.get()*2 - Settings.ACM.get(), Settings.ACH.get());
 
-        Button settings = new Button();
-        settings.setBounds(getFarCompX(checkBox, label), 0, Settings.ACU.get(), Settings.ACH.get());
+        settings = new Button();
+        settings.setBounds(label.getX()+label.getWidth(), 0, Settings.ACU.get(), Settings.ACH.get());
+        settings.addActionListener((e) -> Main.w.accountList.deleteAccount(this));
 
         container.add(label);
-        container.add(checkBox);
+        container.add(checkbox);
         container.add(settings);
 
         container.setVisible(true);
-        container.setBounds(0, Settings.ACH.get() + heightOffset, Settings.ACW.get(), Settings.ACH.get());
+        container.setBounds(Settings.ACM.get(), heightOffset, Settings.ACW.get(), Settings.ACH.get());
         panel.add(container);
     }
 }
