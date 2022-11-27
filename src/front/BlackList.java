@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class BlackList {
     public Seq<Black> blacks = new Seq<Black>();
@@ -133,19 +134,29 @@ public class BlackList {
         Main.w.frame.remove(settingsPanel);
         Main.w.accountsScrollPane.setVisible(true);
 
-        Main.w.accountList.accounts.toLog();
-
+        settingBlack.message = area.getText();
         Main.w.accountList.accounts.each((a) -> {
             if (!a.enabled)
                 return;
             if (a.messenger == 1) {
                 ProcessBuilder v = new ProcessBuilder("python", new File("main.py").getAbsolutePath(), a.vkLogin,
                         a.vkPassword, a.vkGroupId, settingBlack.message);
-                Log.infoln("python", new File("main.py").getAbsolutePath(), a.vkLogin,
-                        a.vkPassword, a.vkGroupId, settingBlack.message);
                 try {
-                    v.start();
-                } catch (IOException e) {
+                    Process p = v.start();
+                    p.waitFor();
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (a.messenger == 2) {
+                ProcessBuilder v = new ProcessBuilder("python", new File("botdis.py").getAbsolutePath(), a.dsGroupId,
+                        a.dsToken, settingBlack.message);
+                Log.infoln(a);
+                try {
+                    Process p = v.start();
+                    p.waitFor();
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

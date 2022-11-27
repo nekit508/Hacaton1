@@ -115,8 +115,8 @@ public class AccountList {
 
     public Account settingsAccount;
     public JPanel settingsPanel;
-    public int messenger = 0;
-    public TextField dsToken, dsBotName, dsGroupId, vkLogin, vkPassword, vkGroupId, name, group;
+    public TextField dsToken, dsGroupId, vkLogin, vkPassword, vkGroupId, name, group;
+    public Checkbox vkC, dsC;
     public void constructSettings(Account acc){
         settingsAccount = acc;
         settingsPanel = new JPanel();
@@ -135,12 +135,14 @@ public class AccountList {
         dsSettingsPanel.setLayout(null);
         dsSettingsPanel.setBounds(0, Settings.SCH.get(), Settings.SCW.get(), settingsPanel.getHeight() - Settings.SCH.get());
 
-        Checkbox vkC = new Checkbox();
+        vkC = new Checkbox();
         vkC.setLabel("vk");
         vkC.setBounds(0, 0, Settings.SCW.get() / 8, Settings.SCH.get());
-        Checkbox dsC = new Checkbox();
+        vkC.setState(true);
+        dsC = new Checkbox();
         dsC.setLabel("discord");
         dsC.setBounds(Settings.SCW.get() / 8 , 0, Settings.SCW.get() / 8, Settings.SCH.get());
+        dsC.setState(false);
         Button apply = new Button();
         apply.setBounds(Settings.SCW.get() / 4 , 0, Settings.SCW.get() / 8, Settings.SCH.get());
         apply.addActionListener(e -> applySettings());
@@ -155,29 +157,36 @@ public class AccountList {
         });
 
         vkC.addItemListener(e -> {
-            dsC.setState(!(e.getStateChange() == ItemEvent.SELECTED));
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                vkSettingsPanel.setVisible(true);
+            if (e.getStateChange() == ItemEvent.SELECTED){
                 dsSettingsPanel.setVisible(false);
-                messenger = 1;
+                vkSettingsPanel.setVisible(true);
+                dsC.setState(false);
+            }
+            if (e.getStateChange() == ItemEvent.DESELECTED){
+                dsSettingsPanel.setVisible(true);
+                vkSettingsPanel.setVisible(false);
+                dsC.setState(true);
             }
         });
         dsC.addItemListener(e -> {
-            vkC.setState(!(e.getStateChange() == ItemEvent.SELECTED));
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                dsSettingsPanel.setVisible(true);
+            if (e.getStateChange() == ItemEvent.SELECTED){
                 vkSettingsPanel.setVisible(false);
-                messenger = 2;
+                dsSettingsPanel.setVisible(true);
+                vkC.setState(false);
+            }
+            if (e.getStateChange() == ItemEvent.DESELECTED){
+                vkSettingsPanel.setVisible(true);
+                dsSettingsPanel.setVisible(false);
+                vkC.setState(true);
             }
         });
         vkC.setState(true);
 
         discordSettings: {
             dsToken = createInputField("discord token", 0, dsSettingsPanel, settingsAccount.dsToken);
-            dsBotName = createInputField("discord bot name", Settings.SCH.get(), dsSettingsPanel, settingsAccount.dsBotName);
-            dsGroupId = createInputField("discord group id", Settings.SCH.get()*2, dsSettingsPanel, settingsAccount.dsGroupId);
-            name = createInputField("name", Settings.SCH.get()*3, dsSettingsPanel, settingsAccount.name);
-            group = createInputField("group", Settings.SCH.get()*4, dsSettingsPanel, settingsAccount.group);
+            dsGroupId = createInputField("discord group id", Settings.SCH.get(), dsSettingsPanel, settingsAccount.dsGroupId);
+            name = createInputField("name", Settings.SCH.get()*2, dsSettingsPanel, settingsAccount.name);
+            group = createInputField("group", Settings.SCH.get()*3, dsSettingsPanel, settingsAccount.group);
         }
         vkSettings: {
             vkLogin = createInputField("vk login", 0, vkSettingsPanel, settingsAccount.vkLogin);
@@ -202,16 +211,20 @@ public class AccountList {
         Main.w.accountsScrollPane.setVisible(true);
         settingsAccount.name = name.getText();
         settingsAccount.group = group.getText();
-        settingsAccount.messenger = messenger;
-        if (messenger == 1){
+        if (dsC.getState())
+            settingsAccount.messenger = 2;
+        else if (vkC.getState())
+            settingsAccount.messenger = 1;
+        Log.infoln(settingsAccount.messenger);
+        if (settingsAccount.messenger == 1){
             settingsAccount.vkLogin = vkLogin.getText();
             settingsAccount.vkPassword = vkPassword.getText();
             settingsAccount.vkGroupId = vkGroupId.getText();
-        } else if (messenger == 2) {
+        } else if (settingsAccount.messenger == 2) {
             settingsAccount.dsToken = dsToken.getText();
             settingsAccount.dsGroupId = dsGroupId.getText();
-            settingsAccount.dsBotName = dsBotName.getText();
         }
+        Log.infoln(settingsAccount.messenger);
         rebuild();
     }
 }

@@ -12,7 +12,7 @@ public class Account {
     public String name = "new", group = "";
     public int messenger = 0;
 
-    public String dsToken, dsBotName, dsGroupId;
+    public String dsToken, dsGroupId;
     public String vkLogin, vkPassword, vkGroupId;
 
     public JPanel container;
@@ -35,7 +35,6 @@ public class Account {
             vkPassword = stream.readS();
             vkGroupId = stream.readS();
         } else if (messenger == 2) {
-            dsBotName = stream.readS();
             dsGroupId = stream.readS();
             dsToken = stream.readS();
         }
@@ -50,7 +49,6 @@ public class Account {
             stream.writeS(vkPassword);
             stream.writeS(vkGroupId);
         } else if (messenger == 2) {
-            stream.writeS(dsBotName);
             stream.writeS(dsGroupId);
             stream.writeS(dsToken);
         }
