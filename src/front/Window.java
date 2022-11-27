@@ -21,6 +21,7 @@ public class Window {
 
     public void construct(){
         loadAccounts();
+        loadBlacks();
 
         frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -51,9 +52,11 @@ public class Window {
         top.add(bB);
 
         accountsScrollPane = new JScrollPane();
+        accountsScrollPane.getVerticalScrollBar().setUnitIncrement(10);
         accountsScrollPane.setBounds(0, 50, 800, 500);
         accountsScrollPane.setVisible(true);
         accountsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        accountsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         frame.add(accountsScrollPane);
 
         reconstructPanels();
@@ -72,10 +75,13 @@ public class Window {
             accounts.setLayout(null);
             accountList.construct();
             accountsScrollPane.setViewportView(accounts);
+            accountsScrollPane.getViewport().setViewSize(accounts.getSize());
+            accountsScrollPane.getViewport().reshape(0, 0, 8000, 8000);
         } else if (selectedPanel == 1) {
             blacks = new JPanel();
             blacks.setVisible(true);
             blacks.setLayout(null);
+            blackList.construct();
             accountsScrollPane.setViewportView(blacks);
         }
     }
@@ -83,12 +89,16 @@ public class Window {
     public void loadAccounts(){
         accountList = new AccountList();
 
-        BaseSaveLoadStream stream = new BaseSaveLoadStream(StreamTypes.READ, "data\\accounts.data");
+        BaseSaveLoadStream stream = new BaseSaveLoadStream(StreamTypes.READ, "data\\" + Settings.accountsSaveFile.get());
         accountList.load(stream);
         stream.close();
     }
 
     public void loadBlacks(){
-        BaseSaveLoadStream stream = new BaseSaveLoadStream(StreamTypes.READ, "data\\blacks.data");
+        blackList = new BlackList();
+
+        BaseSaveLoadStream stream = new BaseSaveLoadStream(StreamTypes.READ, "data\\" + Settings.blacksSaveFile.get());
+        blackList.load(stream);
+        stream.close();
     }
 }

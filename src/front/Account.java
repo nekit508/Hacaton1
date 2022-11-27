@@ -7,10 +7,12 @@ import utils.files.loadsave.BaseSaveLoadStream;
 import javax.swing.*;
 import java.awt.*;
 
-//b6d9ac00d8b131881ff119806cf0500000000000000008b490f0b0399476be78500c758d13e28cee09d1c
-
 public class Account {
-    public String token = "null", name = "new", group = "";
+    public String name = "new", group = "";
+    public int messenger = 0;
+
+    public String dsToken, dsBotName, dsGroupId;
+    public String vkLogin, vkPassword, vkGroupId;
 
     public JPanel container;
     public Checkbox checkbox;
@@ -22,15 +24,15 @@ public class Account {
     }
 
     public void load(BaseSaveLoadStream stream){
-        token = stream.readS();
         name = stream.readS();
         group = stream.readS();
+        messenger = stream.readI();
     }
 
     public void save(BaseSaveLoadStream stream){
-        stream.writeS(token);
         stream.writeS(name);
         stream.writeS(group);
+        stream.writeI(messenger);
     }
 
     public void constructItems(JPanel panel, int heightOffset){
@@ -46,7 +48,7 @@ public class Account {
 
         settings = new Button();
         settings.setBounds(label.getX()+label.getWidth(), 0, Settings.ACU.get(), Settings.ACH.get());
-        settings.addActionListener((e) -> Main.w.accountList.deleteAccount(this));
+        settings.addActionListener((e) -> Main.w.accountList.constructSettings(this));
 
         container.add(label);
         container.add(checkbox);
