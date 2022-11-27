@@ -68,4 +68,35 @@ public class BlackList {
         construct();
         Main.w.frame.repaint();
     }
+
+    public Black settingBlack;
+    public TextArea area;
+    public void constructSettings(Black b){
+        settingBlack = b;
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(null);
+        settingsPanel.setBounds(Main.w.accountsScrollPane.getBounds());
+        settingsPanel.setVisible(true);
+        Main.w.accountsScrollPane.setVisible(false);
+
+        area = new TextArea();
+        area.setText(settingBlack.message);
+
+        JScrollPane scroll = new JScrollPane(area);
+        scroll.setBounds(0, Settings.SCH.get(), settingsPanel.getWidth(), settingsPanel.getHeight() - Settings.SCH.get());
+        Button apply = new Button("Сохранить");
+        apply.addActionListener(e -> {
+            apply();
+        });
+        apply.setBounds(0, 0, settingsPanel.getWidth(), Settings.SCH.get());
+
+        settingsPanel.add(scroll);
+        settingsPanel.add(apply);
+
+        Main.w.frame.add(settingsPanel);
+    }
+
+    public void apply(){
+
+    }
 }

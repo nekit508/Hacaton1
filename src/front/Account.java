@@ -27,12 +27,30 @@ public class Account {
         name = stream.readS();
         group = stream.readS();
         messenger = stream.readI();
+        if (messenger == 1) {
+            vkLogin = stream.readS();
+            vkPassword = stream.readS();
+            vkGroupId = stream.readS();
+        } else if (messenger == 2) {
+            dsBotName = stream.readS();
+            dsGroupId = stream.readS();
+            dsToken = stream.readS();
+        }
     }
 
     public void save(BaseSaveLoadStream stream){
         stream.writeS(name);
         stream.writeS(group);
         stream.writeI(messenger);
+        if (messenger == 1) {
+            stream.writeS(vkLogin);
+            stream.writeS(vkPassword);
+            stream.writeS(vkGroupId);
+        } else if (messenger == 2) {
+            stream.writeS(dsBotName);
+            stream.writeS(dsGroupId);
+            stream.writeS(dsToken);
+        }
     }
 
     public void constructItems(JPanel panel, int heightOffset){

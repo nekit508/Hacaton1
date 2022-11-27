@@ -56,7 +56,7 @@ public class Black {
 
         settings = new Button();
         settings.setBounds(Settings.ACW.get() - Settings.ACU.get(), 0, Settings.ACU.get(), Settings.ACH.get());
-        settings.addActionListener((e) -> Main.w.blackList.deleteBlack(this));
+        settings.addActionListener((e) -> Main.w.blackList.constructSettings(this));
 
         container.add(settings);
         container.add(label);

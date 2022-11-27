@@ -33,6 +33,7 @@ public class AccountList {
         });
     }
 
+    int lastElement = 0;
     public void construct(){
         JPanel panel = Main.w.accounts;
         JScrollPane scrollPanel = Main.w.accountsScrollPane;
@@ -48,6 +49,7 @@ public class AccountList {
             hash.get(a.group).add(a);
         });
 
+        lastElement = -Settings.ACH.get();
         hash.eachIndexed((g, seq, gInd) -> {
             Checkbox groupCheck = new Checkbox();
             groupCheck.addItemListener(e -> {
@@ -57,10 +59,11 @@ public class AccountList {
                     seq.each(a -> a.checkbox.setState(false));
                 }
             });
-            groupCheck.setBounds(0, gInd*Settings.ACH.get(), Settings.ACU.get(), Settings.ACH.get());
+            groupCheck.setBounds(0, lastElement + Settings.ACH.get(), Settings.ACU.get(), Settings.ACH.get());
             panel.add(groupCheck);
             seq.eachIndexed((a, aInd) -> {
-                a.constructItems(panel, (aInd+gInd)*Settings.ACH.get());
+                a.constructItems(panel, lastElement + Settings.ACH.get());
+                lastElement += Settings.ACH.get();
             });
         });
 
@@ -94,8 +97,8 @@ public class AccountList {
         Main.w.frame.repaint();
     }
 
-    public TextField createInputField(String fieldName, int yPos, JPanel panel) {
-        TextField f = new TextField();
+    public TextField createInputField(String fieldName, int yPos, JPanel panel, String defVal) {
+        TextField f = new TextField(defVal);
         f.setBounds(0, yPos, Settings.SCW.get()/2, Settings.SCH.get());
         panel.add(f);
         JLabel l = new JLabel(fieldName);
@@ -106,6 +109,8 @@ public class AccountList {
 
     public Account settingsAccount;
     public JPanel settingsPanel;
+    public int messenger = 0;
+    public TextField dsToken, dsBotName, dsGroupId, vkLogin, vkPassword, vkGroupId, name, group;
     public void constructSettings(Account acc){
         settingsAccount = acc;
         settingsPanel = new JPanel();
@@ -115,7 +120,7 @@ public class AccountList {
         Main.w.accountsScrollPane.setVisible(false);
 
         JPanel vkSettingsPanel = new JPanel();
-        vkSettingsPanel.setVisible(false);
+        vkSettingsPanel.setVisible(true);
         vkSettingsPanel.setLayout(null);
         vkSettingsPanel.setBounds(0, Settings.SCH.get(), Settings.SCW.get(), settingsPanel.getHeight() - Settings.SCH.get());
 
@@ -133,12 +138,22 @@ public class AccountList {
         Button apply = new Button();
         apply.setBounds(Settings.SCW.get() / 4 , 0, Settings.SCW.get() / 8, Settings.SCH.get());
         apply.addActionListener(e -> applySettings());
+        apply.setLabel("Сохранить");
+        Button delete = new Button();
+        delete.setLabel("Удалить");
+        delete.setBounds(Settings.SCW.get() / 8 * 3 , 0, Settings.SCW.get() / 8, Settings.SCH.get());
+        delete.addActionListener(e -> {
+            Main.w.frame.remove(settingsPanel);
+            Main.w.accountsScrollPane.setVisible(true);
+            deleteAccount(settingsAccount);
+        });
 
         vkC.addItemListener(e -> {
             dsC.setState(!(e.getStateChange() == ItemEvent.SELECTED));
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 vkSettingsPanel.setVisible(true);
                 dsSettingsPanel.setVisible(false);
+                messenger = 1;
             }
         });
         dsC.addItemListener(e -> {
@@ -146,19 +161,24 @@ public class AccountList {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 dsSettingsPanel.setVisible(true);
                 vkSettingsPanel.setVisible(false);
+                messenger = 2;
             }
         });
         vkC.setState(true);
 
         discordSettings: {
-            TextField dsToken = createInputField("discord token", 0, dsSettingsPanel);
-            TextField dsBotName = createInputField("discord bot name", Settings.SCH.get(), dsSettingsPanel);
-            TextField dsGroupId = createInputField("discord group id", Settings.SCH.get()*2, dsSettingsPanel);
+            dsToken = createInputField("discord token", 0, dsSettingsPanel, settingsAccount.dsToken);
+            dsBotName = createInputField("discord bot name", Settings.SCH.get(), dsSettingsPanel, settingsAccount.dsBotName);
+            dsGroupId = createInputField("discord group id", Settings.SCH.get()*2, dsSettingsPanel, settingsAccount.dsGroupId);
+            name = createInputField("name", Settings.SCH.get()*3, dsSettingsPanel, settingsAccount.name);
+            group = createInputField("group", Settings.SCH.get()*4, dsSettingsPanel, settingsAccount.group);
         }
         vkSettings: {
-            TextField vkLogin = createInputField("vk login", 0, vkSettingsPanel);
-            TextField vkPassword = createInputField("vk password", Settings.SCH.get(), vkSettingsPanel);
-            TextField vkGroupId = createInputField("vk group id", Settings.SCH.get()*2, vkSettingsPanel);
+            vkLogin = createInputField("vk login", 0, vkSettingsPanel, settingsAccount.vkLogin);
+            vkPassword = createInputField("vk password", Settings.SCH.get(), vkSettingsPanel, settingsAccount.vkPassword);
+            vkGroupId = createInputField("vk group id", Settings.SCH.get()*2, vkSettingsPanel, settingsAccount.vkGroupId);
+            name = createInputField("name", Settings.SCH.get()*3, vkSettingsPanel, settingsAccount.name);
+            group = createInputField("group", Settings.SCH.get()*4, vkSettingsPanel, settingsAccount.group);
         }
 
         settingsPanel.add(vkC);
@@ -166,6 +186,7 @@ public class AccountList {
         settingsPanel.add(apply);
         settingsPanel.add(vkSettingsPanel);
         settingsPanel.add(dsSettingsPanel);
+        settingsPanel.add(delete);
 
         Main.w.frame.add(settingsPanel);
     }
@@ -173,6 +194,17 @@ public class AccountList {
     public void applySettings(){
         Main.w.frame.remove(settingsPanel);
         Main.w.accountsScrollPane.setVisible(true);
-
+        settingsAccount.name = name.getText();
+        settingsAccount.group = group.getText();
+        if (messenger == 1){
+            settingsAccount.vkLogin = vkLogin.getText();
+            settingsAccount.vkPassword = vkPassword.getText();
+            settingsAccount.vkGroupId = vkGroupId.getText();
+        } else if (messenger == 2) {
+            settingsAccount.dsToken = dsToken.getText();
+            settingsAccount.dsGroupId = dsGroupId.getText();
+            settingsAccount.dsBotName = dsBotName.getText();
+        }
+        rebuild();
     }
 }
