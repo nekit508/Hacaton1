@@ -54,9 +54,15 @@ public class AccountList {
             Checkbox groupCheck = new Checkbox();
             groupCheck.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    seq.each(a -> a.checkbox.setState(true));
+                    seq.each(a -> {
+                        a.checkbox.setState(true);
+                        a.enabled = true;
+                    });
                 } else {
-                    seq.each(a -> a.checkbox.setState(false));
+                    seq.each(a -> {
+                        a.checkbox.setState(false);
+                        a.enabled = false;
+                    });
                 }
             });
             groupCheck.setBounds(0, lastElement + Settings.ACH.get(), Settings.ACU.get(), Settings.ACH.get());
@@ -196,6 +202,7 @@ public class AccountList {
         Main.w.accountsScrollPane.setVisible(true);
         settingsAccount.name = name.getText();
         settingsAccount.group = group.getText();
+        settingsAccount.messenger = messenger;
         if (messenger == 1){
             settingsAccount.vkLogin = vkLogin.getText();
             settingsAccount.vkPassword = vkPassword.getText();

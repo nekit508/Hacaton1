@@ -6,6 +6,7 @@ import utils.files.loadsave.BaseSaveLoadStream;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 
 public class Account {
     public String name = "new", group = "";
@@ -18,6 +19,8 @@ public class Account {
     public Checkbox checkbox;
     public JLabel label;
     public Button settings;
+
+    public boolean enabled = false;
 
     public Account(){
         Main.w.accountList.accounts.add(this);
@@ -58,6 +61,10 @@ public class Account {
         container.setLayout(null);
 
         checkbox = new Checkbox();
+        checkbox.setState(enabled);
+        checkbox.addItemListener(e -> {
+            enabled = e.getStateChange() == ItemEvent.SELECTED;
+        });
         checkbox.setBounds(0, 0, Settings.ACU.get(), Settings.ACH.get());
 
         label = new JLabel();
